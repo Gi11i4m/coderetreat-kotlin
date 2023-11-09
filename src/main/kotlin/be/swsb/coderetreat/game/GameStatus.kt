@@ -1,4 +1,4 @@
-package be.swsb.coderetreat
+package be.swsb.coderetreat.game
 
 enum class GameStatus {
     NEW_GAME,

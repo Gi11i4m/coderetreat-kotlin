@@ -1,4 +1,4 @@
-package be.swsb.coderetreat
+package be.swsb.coderetreat.game
 
 import be.swsb.coderetreat.location.Coordinate
 import be.swsb.coderetreat.location.Direction.RIGHT

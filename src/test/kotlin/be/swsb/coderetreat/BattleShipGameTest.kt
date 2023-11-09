@@ -1,17 +1,21 @@
 package be.swsb.coderetreat
 
-import be.swsb.coderetreat.GameStatus.*
+import be.swsb.coderetreat.game.BattleShipGame
+import be.swsb.coderetreat.game.BattleShipGameInProgress
+import be.swsb.coderetreat.game.GameStatus.*
+import be.swsb.coderetreat.game.BattleShipGameNotStarted
 import be.swsb.coderetreat.location.Direction.RIGHT
 import be.swsb.coderetreat.location.Direction.UP
 import be.swsb.coderetreat.location.Coordinate
 import be.swsb.coderetreat.location.Vector
 import be.swsb.coderetreat.ships.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-fun aValidGame(): BattleShipGame {
-    return BattleShipGame()
+fun aValidGame(): BattleShipGameInProgress {
+    return BattleShipGame.new()
         .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
         .placePlayerOneShip(Vector(3u, 1u, UP), BattleShip())
         .placePlayerOneShip(Vector(3u, 3u, RIGHT), Destroyer())
@@ -23,13 +27,14 @@ fun aValidGame(): BattleShipGame {
         .placePlayerTwoShip(Vector(3u, 3u, RIGHT), Destroyer())
         .placePlayerTwoShip(Vector(5u, 5u, RIGHT), Submarine())
         .placePlayerTwoShip(Vector(8u, 7u, UP), PatrolBoat())
+        .start()
 }
 
 class BattleShipGameTest {
 
     @Test
     fun `new game`() {
-        assertEquals(aValidGame().status, NEW_GAME)
+        assertInstanceOf(aValidGame()::class.java, BattleShipGameNotStarted::class.java)
     }
 
     @Test
@@ -102,15 +107,16 @@ class BattleShipGameTest {
 
     @Test
     fun `out of bounds ship placement`() {
-        val exception = assertThrows<Error> { BattleShipGame().placePlayerOneShip(Vector(7u, 7u, RIGHT), Carrier()) }
+        val exception =
+            assertThrows<Error> { BattleShipGame.new().placePlayerOneShip(Vector(7u, 7u, RIGHT), Carrier()) }
 
         assertEquals(exception.message, "Ship placed out of bounds")
     }
 
     @Test
-    fun `not all ships placed when firing first shot`() {
+    fun `not all ships placed when starting game`() {
         val exception = assertThrows<Error> {
-            BattleShipGame()
+            BattleShipGame.new()
                 .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
                 .placePlayerOneShip(Vector(3u, 1u, UP), BattleShip())
                 .placePlayerOneShip(Vector(3u, 3u, RIGHT), Destroyer())
@@ -122,7 +128,7 @@ class BattleShipGameTest {
                 .placePlayerTwoShip(Vector(5u, 5u, RIGHT), Submarine())
                 .placePlayerTwoShip(Vector(8u, 7u, UP), PatrolBoat())
 
-                .playerOneFire(Coordinate(1u, 1u))
+                .start()
         }
 
         assertEquals(exception.message, "Not all ships have been placed")
@@ -131,7 +137,7 @@ class BattleShipGameTest {
     @Test
     fun `trying to place a ship twice`() {
         val exception = assertThrows<Error> {
-            BattleShipGame()
+            BattleShipGame.new()
                 .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
                 .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
         }
@@ -142,29 +148,12 @@ class BattleShipGameTest {
     @Test
     fun `overlapping ships placed`() {
         val exception = assertThrows<Error> {
-            BattleShipGame()
+            BattleShipGame.new()
                 .placePlayerOneShip(Vector(3u, 1u, UP), Carrier())
                 .placePlayerOneShip(Vector(2u, 2u, RIGHT), BattleShip())
         }
 
         assertEquals(exception.message, "Tried to place overlapping ships")
-    }
-
-    /**
-     * This could be made impossible by separating the concept
-     * of placing ships from the actual game, for example by
-     * introducing a concept of Field / Grid and placing the ships
-     * on there, and creating the game with two fields
-     */
-    @Test
-    fun `trying to place a ship after the game has started`() {
-        val exception = assertThrows<Error> {
-            aValidGame()
-                .playerOneFire(Coordinate(1u, 1u))
-                .placePlayerOneShip(Vector(1u, 6u, RIGHT), PatrolBoat())
-        }
-
-        assertEquals(exception.message, "Tried to place a ship after the game started")
     }
 }
 
