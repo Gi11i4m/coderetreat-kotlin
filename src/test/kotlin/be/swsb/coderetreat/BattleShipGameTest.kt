@@ -1,45 +1,170 @@
 package be.swsb.coderetreat
 
-import be.swsb.coderetreat.Direction.RIGHT
-import be.swsb.coderetreat.Direction.UP
+import be.swsb.coderetreat.GameStatus.*
+import be.swsb.coderetreat.location.Direction.RIGHT
+import be.swsb.coderetreat.location.Direction.UP
+import be.swsb.coderetreat.location.Coordinate
+import be.swsb.coderetreat.location.Vector
+import be.swsb.coderetreat.ships.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 fun aValidGame(): BattleShipGame {
     return BattleShipGame()
-        .placePlayerOneShip(Vector(1, 1, RIGHT), CarrierShip())
-        .placePlayerOneShip(Vector(3, 1, UP), BattleShip())
-        .placePlayerOneShip(Vector(3, 3, RIGHT), DestroyerShip())
-        .placePlayerOneShip(Vector(5, 5, RIGHT), SubmarineShip())
-        .placePlayerOneShip(Vector(8, 9, UP), PatrolShip())
-        .placePlayerTwoShip(Vector(1, 1, RIGHT), CarrierShip())
-        .placePlayerTwoShip(Vector(3, 1, UP), BattleShip())
-        .placePlayerTwoShip(Vector(3, 3, RIGHT), DestroyerShip())
-        .placePlayerTwoShip(Vector(5, 5, RIGHT), SubmarineShip())
-        .placePlayerTwoShip(Vector(8, 9, UP), PatrolShip())
+        .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
+        .placePlayerOneShip(Vector(3u, 1u, UP), BattleShip())
+        .placePlayerOneShip(Vector(3u, 3u, RIGHT), Destroyer())
+        .placePlayerOneShip(Vector(5u, 5u, RIGHT), Submarine())
+        .placePlayerOneShip(Vector(8u, 7u, UP), PatrolBoat())
+
+        .placePlayerTwoShip(Vector(1u, 1u, RIGHT), Carrier())
+        .placePlayerTwoShip(Vector(3u, 1u, UP), BattleShip())
+        .placePlayerTwoShip(Vector(3u, 3u, RIGHT), Destroyer())
+        .placePlayerTwoShip(Vector(5u, 5u, RIGHT), Submarine())
+        .placePlayerTwoShip(Vector(8u, 7u, UP), PatrolBoat())
 }
 
 class BattleShipGameTest {
 
     @Test
-    fun scenario() {
+    fun `new game`() {
+        assertEquals(aValidGame().status, NEW_GAME)
+    }
+
+    @Test
+    fun `player always hits and wins`() {
         val game = aValidGame()
-            .playerOneFire(Coordinate())
-            .playerTwoFire(Coordinate())
+            // Carrier
+            .playerOneFire(Coordinate(1u, 1u))
+            .playerOneFire(Coordinate(2u, 1u))
+            .playerOneFire(Coordinate(3u, 1u))
+            .playerOneFire(Coordinate(4u, 1u))
+            .playerOneFire(Coordinate(5u, 1u))
+            // BattleShip
+            .playerOneFire(Coordinate(3u, 1u))
+            .playerOneFire(Coordinate(3u, 2u))
+            .playerOneFire(Coordinate(3u, 3u))
+            .playerOneFire(Coordinate(3u, 4u))
+            // Destroyer
+            .playerOneFire(Coordinate(3u, 3u))
+            .playerOneFire(Coordinate(4u, 3u))
+            .playerOneFire(Coordinate(5u, 3u))
+            // Submarine
+            .playerOneFire(Coordinate(5u, 5u))
+            .playerOneFire(Coordinate(6u, 5u))
+            .playerOneFire(Coordinate(7u, 5u))
+            // PatrolBoat
+            .playerOneFire(Coordinate(8u, 7u))
+            .playerOneFire(Coordinate(8u, 8u))
+
+        assertEquals(game.status, PLAYER_ONE_WINS)
     }
 
     @Test
-    fun `scenario - out of bounds ship placements`() {
-        TODO()
+    fun `player hits`() {
+        val game = aValidGame()
+            .playerOneFire(Coordinate(2u, 1u))
+
+        assertEquals(game.status, PLAYER_ONE_HIT)
     }
 
     @Test
-    fun `scenario - not all ships placed`() {
-        TODO()
+    fun `player misses and loses turn`() {
+        val game = aValidGame()
+            .playerOneFire(Coordinate(2u, 2u))
+
+        assertEquals(game.status, PLAYER_ONE_MISSED)
     }
 
     @Test
-    fun `scenario - overlapping ships placed`() {
-        TODO()
+    fun `player fires at the same spot twice (miss)`() {
+        val game = aValidGame()
+            .playerOneFire(Coordinate(1u, 1u))
+            .playerOneFire(Coordinate(1u, 1u))
+
+        assertEquals(game.status, PLAYER_TWO_MISSED)
+    }
+
+    @Test
+    fun `player fires out of turn`() {
+        val exception = assertThrows<Error> { aValidGame().playerTwoFire(Coordinate(1u, 1u)) }
+
+        assertEquals(exception.message, "It is not player two's turn")
+    }
+
+    @Test
+    fun `player fires out of bounds`() {
+        val exception = assertThrows<Error> { aValidGame().playerTwoFire(Coordinate(10u, 10u)) }
+
+        assertEquals(exception.message, "Shot out of bounds")
+    }
+
+    @Test
+    fun `out of bounds ship placement`() {
+        val exception = assertThrows<Error> { BattleShipGame().placePlayerOneShip(Vector(7u, 7u, RIGHT), Carrier()) }
+
+        assertEquals(exception.message, "Ship placed out of bounds")
+    }
+
+    @Test
+    fun `not all ships placed when firing first shot`() {
+        val exception = assertThrows<Error> {
+            BattleShipGame()
+                .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
+                .placePlayerOneShip(Vector(3u, 1u, UP), BattleShip())
+                .placePlayerOneShip(Vector(3u, 3u, RIGHT), Destroyer())
+                .placePlayerOneShip(Vector(5u, 5u, RIGHT), Submarine())
+                .placePlayerOneShip(Vector(8u, 7u, UP), PatrolBoat())
+
+                .placePlayerTwoShip(Vector(1u, 1u, RIGHT), Carrier())
+                .placePlayerTwoShip(Vector(3u, 1u, UP), BattleShip())
+                .placePlayerTwoShip(Vector(5u, 5u, RIGHT), Submarine())
+                .placePlayerTwoShip(Vector(8u, 7u, UP), PatrolBoat())
+
+                .playerOneFire(Coordinate(1u, 1u))
+        }
+
+        assertEquals(exception.message, "Not all ships have been placed")
+    }
+
+    @Test
+    fun `trying to place a ship twice`() {
+        val exception = assertThrows<Error> {
+            BattleShipGame()
+                .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
+                .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
+        }
+
+        assertEquals(exception.message, "Tried to place the same ship twice")
+    }
+
+    @Test
+    fun `overlapping ships placed`() {
+        val exception = assertThrows<Error> {
+            BattleShipGame()
+                .placePlayerOneShip(Vector(3u, 1u, UP), Carrier())
+                .placePlayerOneShip(Vector(2u, 2u, RIGHT), BattleShip())
+        }
+
+        assertEquals(exception.message, "Tried to place overlapping ships")
+    }
+
+    /**
+     * This could be made impossible by separating the concept
+     * of placing ships from the actual game, for example by
+     * introducing a concept of Field / Grid and placing the ships
+     * on there, and creating the game with two fields
+     */
+    @Test
+    fun `trying to place a ship after the game has started`() {
+        val exception = assertThrows<Error> {
+            aValidGame()
+                .playerOneFire(Coordinate(1u, 1u))
+                .placePlayerOneShip(Vector(1u, 6u, RIGHT), PatrolBoat())
+        }
+
+        assertEquals(exception.message, "Tried to place a ship after the game started")
     }
 }
 
