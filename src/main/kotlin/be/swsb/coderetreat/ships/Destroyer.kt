@@ -1,5 +1,3 @@
 package be.swsb.coderetreat.ships
 
-class Destroyer : Ship {
-    override val length = 3u
-}
+class Destroyer : Ship(3u) {}

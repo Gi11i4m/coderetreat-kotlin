@@ -1,8 +1,8 @@
 package be.swsb.coderetreat.game
 
 sealed class BattleShipGame(
-    val shipPlacementsPlayerOne: HashSet<ShipPlacement>,
-    val shipPlacementsPlayerTwo: HashSet<ShipPlacement>
+    val playerOneField: Field,
+    val playerTwoField: Field
 ) {
     companion object {
         fun new(): BattleShipGameNotStarted {

@@ -6,8 +6,11 @@ import be.swsb.coderetreat.location.Direction.UP
 import be.swsb.coderetreat.location.Vector
 import be.swsb.coderetreat.ships.Ship
 
-class ShipPlacement(vector: Vector, ship: Ship) {
-    private val coordinates: Set<Coordinate>
+class ShipPlacement(vector: Vector, val ship: Ship) {
+    val coordinates: Set<Coordinate>
+        get() {
+            return field
+        }
 
     init {
         coordinates = shipVectorToCoordinateList(ship, vector)
@@ -27,5 +30,9 @@ class ShipPlacement(vector: Vector, ship: Ship) {
 
     fun overlaps(otherShipPlacement: ShipPlacement): Boolean {
         return coordinates.any { otherShipPlacement.coordinates.contains(it) }
+    }
+
+    fun contains(coordinate: Coordinate): Boolean {
+        return coordinates.contains(coordinate)
     }
 }
