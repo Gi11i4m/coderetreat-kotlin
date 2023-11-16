@@ -1,3 +1,3 @@
 package be.swsb.coderetreat.ships
 
-class Submarine : Ship(3u) {}
+class Submarine : Ship(3u)

@@ -6,33 +6,26 @@ import be.swsb.coderetreat.location.Direction.UP
 import be.swsb.coderetreat.location.Vector
 import be.swsb.coderetreat.ships.Ship
 
-class ShipPlacement(vector: Vector, val ship: Ship) {
-    val coordinates: Set<Coordinate>
-        get() {
-            return field
-        }
-
-    init {
-        coordinates = shipVectorToCoordinateList(ship, vector)
-    }
-
-    private fun shipVectorToCoordinateList(ship: Ship, vector: Vector): Set<Coordinate> {
-        return UIntRange(0u, ship.length - 1u).map {
-            if (vector.direction == RIGHT) {
-                return@map Coordinate(vector.x + it, vector.y)
-            }
-            if (vector.direction == UP) {
-                return@map Coordinate(vector.x, vector.y + it)
-            }
-            return@map Coordinate(vector.x, vector.y)
-        }.toSet()
-    }
+class ShipPlacement(private val vector: Vector, val ship: Ship) {
+    val coordinates get() = vector.getCoordinatesFor(ship)
 
     fun overlaps(otherShipPlacement: ShipPlacement): Boolean {
-        return coordinates.any { otherShipPlacement.coordinates.contains(it) }
+        return vector.getCoordinatesFor(ship).any { otherShipPlacement.contains(it) }
     }
 
     fun contains(coordinate: Coordinate): Boolean {
-        return coordinates.contains(coordinate)
+        return vector.getCoordinatesFor(ship).contains(coordinate)
     }
+}
+
+private fun Vector.getCoordinatesFor(ship: Ship): Set<Coordinate> {
+    return UIntRange(0u, ship.length - 1u).map {
+        if (this.direction == RIGHT) {
+            return@map Coordinate(this.x + it, this.y)
+        }
+        if (this.direction == UP) {
+            return@map Coordinate(this.x, this.y + it)
+        }
+        return@map Coordinate(this.x, this.y)
+    }.toSet()
 }

@@ -2,6 +2,7 @@ package be.swsb.coderetreat.game
 
 import be.swsb.coderetreat.location.Coordinate
 import be.swsb.coderetreat.ships.Ship
+import kotlin.reflect.KClass
 
 class Field {
     /**
@@ -13,20 +14,33 @@ class Field {
     private val receivedShots: HashSet<Coordinate> = HashSet()
 
     fun add(ship: ShipPlacement) {
+        val overlappingShip = findOverlappingShip(ship)
+        if (overlappingShip != null) {
+            throw Error("Tried to place overlapping ships (${ship.ship::class.simpleName}, ${overlappingShip.ship::class.simpleName})")
+        }
         if (ship.isOutOfBounds(inclusiveUpperBound)) {
             throw Error("Ship placed out of bounds")
         }
-        if (containsShipType(ship.ship)) {
-            throw Error("Tried to place the same ship twice")
+        val duplicateShipType = findShipType(ship.ship)
+        if (duplicateShipType != null) {
+            throw Error("Tried to place the same ship twice (${duplicateShipType::class.simpleName})")
         }
         ships.add(ship)
     }
 
-    private fun containsShipType(ship: Ship): Boolean {
-        return ships.any { it::class == ship::class } // TODO: compare like this everywhere else (remove all `java...`)
+    fun verifyAllShipsPresent() {
+        val allShipTypes: List<KClass<out Ship>> = Ship::class.sealedSubclasses
+        val presentShipTypes = ships.map { it.ship::class }
+        if (!presentShipTypes.containsAll(allShipTypes)) {
+            throw Error("Not all ships have been placed")
+        }
     }
 
-    fun containsOverlappingShipFor(ship: ShipPlacement): ShipPlacement? {
+    private fun findShipType(ship: Ship): Ship? {
+        return ships.map { it.ship }.find { it::class == ship::class }
+    }
+
+    private fun findOverlappingShip(ship: ShipPlacement): ShipPlacement? {
         return ships.find { it.overlaps(ship) }
     }
 
@@ -39,10 +53,10 @@ class Field {
         }
 
         receivedShots.add(coordinate)
-        return isHit(coordinate)
+        return isShip(coordinate)
     }
 
-    private fun isHit(coordinate: Coordinate): Boolean {
+    private fun isShip(coordinate: Coordinate): Boolean {
         return ships.any { it.contains(coordinate) }
     }
 
@@ -59,7 +73,7 @@ class Field {
                 val coordinate = Coordinate(x, y)
                 if (receivedShots.contains(coordinate)) {
                     "💥"
-                } else if (isHit(coordinate)) {
+                } else if (isShip(coordinate)) {
                     "⛵"
                 } else {
                     "⬜"

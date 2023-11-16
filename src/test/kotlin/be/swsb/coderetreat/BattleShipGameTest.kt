@@ -1,9 +1,6 @@
 package be.swsb.coderetreat
 
-import be.swsb.coderetreat.game.BattleShipGame
-import be.swsb.coderetreat.game.BattleShipGameInProgress
-import be.swsb.coderetreat.game.BattleShipGameNotStarted
-import be.swsb.coderetreat.game.GameStatus.*
+import be.swsb.coderetreat.game.*
 import be.swsb.coderetreat.location.Coordinate
 import be.swsb.coderetreat.location.Direction.RIGHT
 import be.swsb.coderetreat.location.Direction.UP
@@ -13,7 +10,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-fun aValidGame(): BattleShipGameInProgress {
+fun aValidGame(): BattleShipGameInProgressPlayerOneTurn {
     return BattleShipGame.new()
         .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
         .placePlayerOneShip(Vector(3u, 2u, UP), BattleShip())
@@ -29,6 +26,31 @@ fun aValidGame(): BattleShipGameInProgress {
         .start()
 }
 
+val aPlayerOneWinningGame = aValidGame()
+    // Carrier
+    .playerOneFire(Coordinate(1u, 1u))
+    .playerOneFire(Coordinate(2u, 1u))
+    .playerOneFire(Coordinate(3u, 1u))
+    .playerOneFire(Coordinate(4u, 1u))
+    .playerOneFire(Coordinate(5u, 1u))
+    // BattleShip
+    .playerOneFire(Coordinate(3u, 2u))
+    .playerOneFire(Coordinate(3u, 3u))
+    .playerOneFire(Coordinate(3u, 4u))
+    .playerOneFire(Coordinate(3u, 5u))
+    // Destroyer
+    .playerOneFire(Coordinate(4u, 3u))
+    .playerOneFire(Coordinate(5u, 3u))
+    .playerOneFire(Coordinate(6u, 3u))
+    // Submarine
+    .playerOneFire(Coordinate(5u, 5u))
+    .playerOneFire(Coordinate(6u, 5u))
+    .playerOneFire(Coordinate(7u, 5u))
+    // PatrolBoat
+    .playerOneFire(Coordinate(8u, 7u))
+    .playerOneFire(Coordinate(8u, 8u))
+
+
 class BattleShipGameTest {
 
     @Test
@@ -38,36 +60,12 @@ class BattleShipGameTest {
 
     @Test
     fun `game in progress`() {
-        assertEquals(aValidGame()::class.qualifiedName, BattleShipGameInProgress::class.qualifiedName)
+        assertEquals(aValidGame()::class, BattleShipGameInProgressPlayerOneTurn::class)
     }
 
     @Test
     fun `player always hits and wins`() {
-        val game = aValidGame()
-            // Carrier
-            .playerOneFire(Coordinate(1u, 1u))
-            .playerOneFire(Coordinate(2u, 1u))
-            .playerOneFire(Coordinate(3u, 1u))
-            .playerOneFire(Coordinate(4u, 1u))
-            .playerOneFire(Coordinate(5u, 1u))
-            // BattleShip
-            .playerOneFire(Coordinate(3u, 2u))
-            .playerOneFire(Coordinate(3u, 3u))
-            .playerOneFire(Coordinate(3u, 4u))
-            .playerOneFire(Coordinate(3u, 5u))
-            // Destroyer
-            .playerOneFire(Coordinate(4u, 3u))
-            .playerOneFire(Coordinate(5u, 3u))
-            .playerOneFire(Coordinate(6u, 3u))
-            // Submarine
-            .playerOneFire(Coordinate(5u, 5u))
-            .playerOneFire(Coordinate(6u, 5u))
-            .playerOneFire(Coordinate(7u, 5u))
-            // PatrolBoat
-            .playerOneFire(Coordinate(8u, 7u))
-            .playerOneFire(Coordinate(8u, 8u))
-
-        assertEquals(PLAYER_ONE_WINS, game.status)
+        assertEquals(BattleShipGameInProgressPlayerOneWins::class, aPlayerOneWinningGame::class)
     }
 
     @Test
@@ -75,7 +73,7 @@ class BattleShipGameTest {
         val game = aValidGame()
             .playerOneFire(Coordinate(2u, 1u))
 
-        assertEquals(PLAYER_ONE_HIT, game.status)
+        assertEquals(BattleShipGameInProgressPlayerOneTurn::class, game::class)
     }
 
     @Test
@@ -83,7 +81,7 @@ class BattleShipGameTest {
         val game = aValidGame()
             .playerOneFire(Coordinate(2u, 2u))
 
-        assertEquals(PLAYER_ONE_MISSED, game.status)
+        assertEquals(BattleShipGameInProgressPlayerTwoTurn::class, game::class)
     }
 
     @Test
@@ -137,14 +135,14 @@ class BattleShipGameTest {
         val exception = assertThrows<Error> {
             BattleShipGame.new()
                 .placePlayerOneShip(Vector(1u, 1u, RIGHT), Carrier())
-                .placePlayerOneShip(Vector(3u, 1u, UP), BattleShip())
-                .placePlayerOneShip(Vector(3u, 3u, RIGHT), Destroyer())
+                .placePlayerOneShip(Vector(3u, 2u, UP), BattleShip())
+                .placePlayerOneShip(Vector(4u, 3u, RIGHT), Destroyer())
                 .placePlayerOneShip(Vector(5u, 5u, RIGHT), Submarine())
                 .placePlayerOneShip(Vector(8u, 7u, UP), PatrolBoat())
 
                 .placePlayerTwoShip(Vector(1u, 1u, RIGHT), Carrier())
-                .placePlayerTwoShip(Vector(3u, 1u, UP), BattleShip())
-                .placePlayerTwoShip(Vector(5u, 5u, RIGHT), Submarine())
+                .placePlayerTwoShip(Vector(3u, 2u, UP), BattleShip())
+                .placePlayerTwoShip(Vector(4u, 3u, RIGHT), Destroyer())
                 .placePlayerTwoShip(Vector(8u, 7u, UP), PatrolBoat())
 
                 .start()
@@ -161,7 +159,7 @@ class BattleShipGameTest {
                 .placePlayerOneShip(Vector(1u, 2u, RIGHT), Carrier())
         }
 
-        assertEquals("Tried to place the same ship twice", exception.message)
+        assertEquals("Tried to place the same ship twice (Carrier)", exception.message)
     }
 
     @Test
@@ -173,6 +171,13 @@ class BattleShipGameTest {
         }
 
         assertEquals("Tried to place overlapping ships (BattleShip, Carrier)", exception.message)
+    }
+
+    @Test
+    fun `no action possible after game ends`() {
+        val exception = assertThrows<Error> { aPlayerOneWinningGame.playerOneFire(Coordinate(7u, 7u)) }
+
+        assertEquals("Game over (player one wins)", exception.message)
     }
 }
 

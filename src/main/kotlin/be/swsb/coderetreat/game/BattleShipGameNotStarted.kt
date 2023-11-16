@@ -6,30 +6,18 @@ import be.swsb.coderetreat.ships.Ship
 class BattleShipGameNotStarted : BattleShipGame(Field(), Field()) {
 
     fun placePlayerOneShip(vector: Vector, ship: Ship): BattleShipGameNotStarted {
-        val shipPlacement = ShipPlacement(vector, ship)
-        verifyOverlapWithOtherShips(shipPlacement, this.playerOneField)
-        this.playerOneField.add(shipPlacement)
-        return this;
-    }
-
-    fun placePlayerTwoShip(vector: Vector, ship: Ship): BattleShipGameNotStarted {
-        val shipPlacement = ShipPlacement(vector, ship)
-        verifyOverlapWithOtherShips(shipPlacement, this.playerTwoField)
-        this.playerTwoField.add(shipPlacement)
+        this.playerOneField.add(ShipPlacement(vector, ship))
         return this
     }
 
-    private fun verifyOverlapWithOtherShips(
-        ship: ShipPlacement,
-        field: Field
-    ) {
-        val overlappingShip = field.containsOverlappingShipFor(ship)
-        if (overlappingShip != null) {
-            throw Error("Tried to place overlapping ships (${ship.ship.javaClass.simpleName}, ${overlappingShip.ship.javaClass.simpleName})")
-        }
+    fun placePlayerTwoShip(vector: Vector, ship: Ship): BattleShipGameNotStarted {
+        this.playerTwoField.add(ShipPlacement(vector, ship))
+        return this
     }
 
-    fun start(): BattleShipGameInProgress {
-        return BattleShipGameInProgress(this.playerOneField, this.playerTwoField)
+    fun start(): BattleShipGameInProgressPlayerOneTurn {
+        this.playerOneField.verifyAllShipsPresent()
+        this.playerTwoField.verifyAllShipsPresent()
+        return BattleShipGameInProgressPlayerOneTurn(this.playerOneField, this.playerTwoField)
     }
 }
