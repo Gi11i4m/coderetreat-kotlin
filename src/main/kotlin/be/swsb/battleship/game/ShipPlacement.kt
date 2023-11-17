@@ -10,11 +10,11 @@ class ShipPlacement(private val vector: Vector, val ship: Ship) {
     val coordinates get() = vector.getCoordinatesFor(ship)
 
     fun overlaps(otherShipPlacement: ShipPlacement): Boolean {
-        return vector.getCoordinatesFor(ship).any { otherShipPlacement.contains(it) }
+        return coordinates.any { otherShipPlacement.contains(it) }
     }
 
     fun contains(coordinate: Coordinate): Boolean {
-        return vector.getCoordinatesFor(ship).contains(coordinate)
+        return coordinates.contains(coordinate)
     }
 }
 
