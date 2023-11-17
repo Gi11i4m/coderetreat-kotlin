@@ -1,6 +1,6 @@
-package be.swsb.coderetreat.game
+package be.swsb.battleship.game
 
-import be.swsb.coderetreat.location.Coordinate
+import be.swsb.battleship.location.Coordinate
 
 class BattleShipGameInProgressPlayerOneTurn(
     playerOneField: Field,

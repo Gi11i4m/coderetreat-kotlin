@@ -1,4 +1,4 @@
-package be.swsb.coderetreat.location
+package be.swsb.battleship.location
 
 enum class Direction {
     RIGHT, UP

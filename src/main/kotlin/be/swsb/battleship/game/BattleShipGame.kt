@@ -1,4 +1,4 @@
-package be.swsb.coderetreat.game
+package be.swsb.battleship.game
 
 sealed class BattleShipGame(
     val playerOneField: Field,

@@ -1,10 +1,10 @@
-package be.swsb.coderetreat.game
+package be.swsb.battleship.game
 
-import be.swsb.coderetreat.location.Coordinate
-import be.swsb.coderetreat.location.Direction.RIGHT
-import be.swsb.coderetreat.location.Direction.UP
-import be.swsb.coderetreat.location.Vector
-import be.swsb.coderetreat.ships.Ship
+import be.swsb.battleship.location.Coordinate
+import be.swsb.battleship.location.Direction.RIGHT
+import be.swsb.battleship.location.Direction.UP
+import be.swsb.battleship.location.Vector
+import be.swsb.battleship.ships.Ship
 
 class ShipPlacement(private val vector: Vector, val ship: Ship) {
     val coordinates get() = vector.getCoordinatesFor(ship)

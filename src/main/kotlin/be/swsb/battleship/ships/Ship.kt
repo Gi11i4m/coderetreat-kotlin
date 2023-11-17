@@ -1,3 +1,3 @@
-package be.swsb.coderetreat.ships
+package be.swsb.battleship.ships
 
 sealed class Ship(val length: UInt)

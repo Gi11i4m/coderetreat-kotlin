@@ -1,7 +1,7 @@
-package be.swsb.coderetreat.game
+package be.swsb.battleship.game
 
-import be.swsb.coderetreat.location.Vector
-import be.swsb.coderetreat.ships.Ship
+import be.swsb.battleship.location.Vector
+import be.swsb.battleship.ships.Ship
 
 class BattleShipGameNotStarted : BattleShipGame(Field(), Field()) {
 

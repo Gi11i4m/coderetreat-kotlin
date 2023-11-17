@@ -1,3 +1,3 @@
-package be.swsb.coderetreat.location
+package be.swsb.battleship.location
 
 data class Vector(val x: UInt, val y: UInt, val direction: Direction)

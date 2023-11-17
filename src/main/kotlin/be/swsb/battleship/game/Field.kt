@@ -1,7 +1,7 @@
-package be.swsb.coderetreat.game
+package be.swsb.battleship.game
 
-import be.swsb.coderetreat.location.Coordinate
-import be.swsb.coderetreat.ships.Ship
+import be.swsb.battleship.location.Coordinate
+import be.swsb.battleship.ships.Ship
 import kotlin.reflect.KClass
 
 class Field {

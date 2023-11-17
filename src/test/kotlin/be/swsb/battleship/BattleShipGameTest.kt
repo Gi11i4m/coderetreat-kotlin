@@ -1,11 +1,11 @@
-package be.swsb.coderetreat
+package be.swsb.battleship
 
-import be.swsb.coderetreat.game.*
-import be.swsb.coderetreat.location.Coordinate
-import be.swsb.coderetreat.location.Direction.RIGHT
-import be.swsb.coderetreat.location.Direction.UP
-import be.swsb.coderetreat.location.Vector
-import be.swsb.coderetreat.ships.*
+import be.swsb.battleship.game.*
+import be.swsb.battleship.location.Coordinate
+import be.swsb.battleship.location.Direction.RIGHT
+import be.swsb.battleship.location.Direction.UP
+import be.swsb.battleship.location.Vector
+import be.swsb.battleship.ships.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

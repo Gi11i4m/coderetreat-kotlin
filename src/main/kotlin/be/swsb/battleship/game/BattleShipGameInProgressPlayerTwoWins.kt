@@ -1,12 +1,12 @@
-package be.swsb.coderetreat.game
+package be.swsb.battleship.game
 
-import be.swsb.coderetreat.location.Coordinate
+import be.swsb.battleship.location.Coordinate
 
-class BattleShipGameInProgressPlayerOneWins(
+class BattleShipGameInProgressPlayerTwoWins(
     playerOneField: Field,
     playerTwoField: Field
 ) : BattleShipGameInProgress(playerOneField, playerTwoField) {
-    private val gameOverMessage = "Game over (player one wins)"
+    private val gameOverMessage = "Game over (player two wins)"
 
     override fun playerOneFire(coordinate: Coordinate): BattleShipGameInProgress {
         throw Error(gameOverMessage)
